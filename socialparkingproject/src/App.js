@@ -14,8 +14,7 @@ function MapLogic ()
     click(e)
     {
         setPos(e.latlng);
-    }
-    
+    },
   })
   return (pos === null)
         ? null
@@ -23,6 +22,17 @@ function MapLogic ()
         <Marker position={pos} icon={defaultIcon}>
         </Marker>
         )
+}
+
+function MapLocation()
+{
+  const map = useMapEvents({
+    locationfound(e)
+    {
+      map.flyTo(e.latlng, 12)
+    },
+  })
+  return null;
 }
 
 class App extends React.Component {
@@ -57,9 +67,10 @@ class App extends React.Component {
   render () {
     return (
       <>
-        <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={true} style={{height: "100vh"}}>
+        <MapContainer center={[0.00, 0.00]} whenCreated={(map) => map.locate()} zoom={12} scrollWheelZoom={true} style={{height: "100vh"}}>
           <TileLayer attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapLocation/>
           {this.tempList.map((position) =>
             <Marker position={[position.location.latitude,position.location.longitude]} icon={defaultIcon}>
               <Popup>
@@ -73,7 +84,6 @@ class App extends React.Component {
             </Marker>
           )}
           <MapLogic/>
-          <MapLogic />
         </MapContainer>
       </>
     );
