@@ -1,19 +1,93 @@
+//import axios from 'axios';
+import * as React from 'react';
+import {MapContainer, Marker, Popup, TileLayer, Tooltip, useMapEvents} from 'react-leaflet';
 import './App.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'bootstrap-css-only/css/bootstrap.min.css';
-import 'mdbreact/dist/css/mdb.css';
-import AddEvent from './components/AddEvent/AddEvent.js';
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+import icon from 'leaflet/dist/images/marker-icon.png'
+let defaultIcon = L.icon({iconUrl: icon});
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-      <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-        <AddEvent/>
-      </header>
-    </div>
-  );
+function MapLogic ()
+{
+  const [pos,setPos] = React.useState(null);
+  useMapEvents({
+    click(e)
+    {
+        setPos(e.latlng);
+    },
+  })
+  return (pos === null)
+        ? null
+        : (
+        <Marker position={pos} icon={defaultIcon}>
+        </Marker>
+        )
+}
+
+function MapLocation()
+{
+  const map = useMapEvents({
+    locationfound(e)
+    {
+      map.flyTo(e.latlng, 12)
+    },
+  })
+  return null;
+}
+
+class App extends React.Component {
+
+  constructor(props)
+  {
+    super(props);
+    //this.state = {positionList: []}
+    this.tempList = [
+      {
+        alertCode: "Vv",
+        classificationTag: "Vvv",
+        location: {latitude: "51.505",longitude: "-0.09"},
+        name: "Event1",
+        reportingTime: "2020-09-01T14:00:00.000Z"
+      },
+      {
+        alertCode: "Bb",
+        classificationTag: "Bbb",
+        location: {latitude: "52.505",longitude: "-1.09"},
+        name: "Event2",
+        reportingTime: "2020-08-01T16:00:00.000Z"
+      }
+    ];
+  }
+
+  /*componentDidMount()
+  {
+    axios.get("localhost:8085/event/getEvents").then((res)=>this.setState({positionList: res.data}));
+  }*/
+
+  render () {
+    return (
+      <>
+        <MapContainer center={[0.00, 0.00]} whenCreated={(map) => map.locate()} zoom={12} scrollWheelZoom={true} style={{height: "100vh"}}>
+          <TileLayer attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapLocation/>
+          {this.tempList.map((position) =>
+            <Marker position={[position.location.latitude,position.location.longitude]} icon={defaultIcon}>
+              <Popup>
+                <div>
+                    <h4>alertCode: {position.alertCode}</h4>
+                    <h4>classificationTag: {position.classificationTag}</h4>
+                    <h4>reportingTime:":{position.reportingTime}</h4>
+                </div>
+              </Popup>
+              <Tooltip permanent direction="top">{position.name}</Tooltip>
+            </Marker>
+          )}
+          <MapLogic/>
+        </MapContainer>
+      </>
+    );
+    }
 }
 
 export default App;
