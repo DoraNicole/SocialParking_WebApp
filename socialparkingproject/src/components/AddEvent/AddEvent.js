@@ -3,10 +3,8 @@ import { useState, useRef } from "react";
 import ReactDOM from 'react-dom';
 import '../AddEvent/AddEvent.css';
 import Modal from '../Modal/Modal.js'
-import MapGoogle from '../MapGoogle/MapGoogle.js'
 import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn } from 'mdbreact';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { Map, GoogleApiWrapper } from 'google-maps-react';
+
 
 
 
@@ -86,19 +84,6 @@ class AddEvent extends Component {
                 </div>
                 <div id="location">
                   <h6 className="text-left dark-grey-text">Location</h6>
-                  {/* <MapContainer id="show-location" center={this.state.currentPosition} zoom={13} scrollWheelZoom={false}>
-                    <TileLayer
-                      attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={this.state.currentPosition}>
-                      <Popup position={this.state.currentPosition}>
-                      Current location: {this.state.currentPosition[0]}, {this.state.currentPosition[1]}
-                      </Popup>
-                    </Marker>
-                  </MapContainer> */}
-                   <MapGoogle />
-                  <MDBBtn onClick={this.componentWillMount}>Locate me</MDBBtn>
                 </div>
                 <div id="eventImage">
                   <h6 className="text-left dark-grey-text">Picture</h6>
@@ -108,9 +93,6 @@ class AddEvent extends Component {
                 <MDBBtn id="add-event">Add event</MDBBtn>
               </form>    
             </Modal>
-            <MDBBtn type="button" onClick={this.showModal}>
-              Open
-            </MDBBtn>
           </main>
          
         )
