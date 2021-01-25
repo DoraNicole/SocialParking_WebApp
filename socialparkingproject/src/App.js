@@ -62,12 +62,18 @@ class App extends React.Component {
       positionList: [],
       file: '',
       imagePreviewUrl: '',
-      reportData: {name:'', id:0, alertCode:'', classificationTag:'', location:[], picture:'', timestamp:''}
+      // reportData: {name:"", alertCode:"", classificationTag:"", location:{}, picture:"", timestamp:""}
+      name: "",
+      alertCode: "",
+      classificationTag:""
     }
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.collectData = this.collectData.bind(this);
+    this.handleName = this.handleName.bind(this);
+    this.handleCode = this.handleCode.bind(this);
+    this.handleClassification = this.handleClassification.bind(this);
   }
 
   showModal = () => {
@@ -80,8 +86,32 @@ class App extends React.Component {
     this.setState({ show: false });
   };
   collectData = () => {
-    this.setState({reportData:{name:'test-web-1', id: 1, alertCode:'medium', classificationTag:'none', location:[], picture:this.state.imagePreviewUrl, timestamp:''}});
+    this.setState({reportData:{name:"test-web-1", alertCode:"medium", classificationTag:"none", location:"{\"latitude\":45, \"longitude\":23}", picture:this.state.imagePreviewUrl, reportingTime:""}});
     console.log(this.state.reportData)
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.state.reportData)
+    };
+    fetch("/event/saveEvent", requestOptions)
+    .then((res)=>res.json().then((res1)=>
+    {
+      console.log(res1);
+      // this.setState({positionList: res1})
+    }))
+    // .then(data => this.setState({ postId: data.id }));
+  }
+  handleName(event) {
+    this.setState({name:event.target.value});
+    // console.log(this.state.reportData)
+  }
+  handleCode(event) {
+    this.setState({alertCode: event.target.value});
+    console.log(this.state.alertCode)
+  }
+  handleClassification(event) {
+    this.setState({classificationTag:event.target.value});
+    console.log(this.state.classificationTag)
   }
 
   componentDidMount()
@@ -119,9 +149,9 @@ class App extends React.Component {
           <form className="form">
             <h2 className="mb-5" id="form-title">Report an event</h2>
             <div id="details" className="text-left">
-              <MDBInput id="tag" label="Classify the event"/>
-              <MDBInput id="code" label="Type the alert code"/>
-              <MDBInput id="description" label="Write a description" type="textarea" rows="5" />
+              <MDBInput id="name" label="Type the event name" onChange={this.handleName}/>
+              <MDBInput id="tag" label="Classify the event" onChange={this.handleClassification}/>
+              <MDBInput id="code" label="Type the alert code" onChange={this.handleCode}/>
             </div>
             <div id="location">
               <h4 className="text-left dark-grey-text">Location</h4>
