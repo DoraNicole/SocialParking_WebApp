@@ -64,7 +64,6 @@ class App extends React.Component {
       positionList: [],
       file: '',
       imagePreviewUrl: '',
-      // reportData: {name:"", alertCode:"", classificationTag:"", location:{}, picture:"", timestamp:""}
       name: "",
       alertCode: "",
       classificationTag:""
@@ -99,11 +98,11 @@ class App extends React.Component {
     };
     fetch("/event/saveEvent", requestOptions)
     .then(response => {
+      alert('The event was reported successfully!')
     console.log(response)})
   }
   handleName(event) {
     this.setState({name:event.target.value});
-    // console.log(this.state.reportData)
   }
   handleCode(event) {
     this.setState({alertCode: event.target.value});
@@ -156,9 +155,6 @@ class App extends React.Component {
               <MDBInput id="tag" label="Classify the event" onChange={this.handleClassification}/>
               <MDBInput id="code" label="Type the alert code" onChange={this.handleCode}/>
             </div>
-            <div id="location">
-              <h4 className="text-left dark-grey-text">Location</h4>
-            </div>
             <div id="eventImage">
               <h4 className="text-left dark-grey-text">Picture</h4>
               <input type="file" size="sm" onChange={this.onDrop}/>
@@ -198,8 +194,6 @@ class App extends React.Component {
       <MDBBtn id="open-btn" type="button" color="lime" onClick={this.showModal}>
           Report event
       </MDBBtn>
-         
-
       </>
     );
     }
