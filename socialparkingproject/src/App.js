@@ -6,6 +6,7 @@ import L from 'leaflet'
 import icon from 'leaflet/dist/images/marker-icon.png'
 import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn } from 'mdbreact';
 import Modal from './components/Modal/Modal'
+import ls from 'local-storage'
 let defaultIcon = L.icon({iconUrl: icon});
 
 function MapLogic ()
@@ -16,6 +17,7 @@ function MapLogic ()
     click(e)
     {
       setPos(e.latlng);
+      ls.set('location', e.latlng);
       document.getElementById("open-btn").style.display = "block";
         
     },
@@ -86,20 +88,18 @@ class App extends React.Component {
     this.setState({ show: false });
   };
   collectData = () => {
-    this.setState({reportData:{name:"test-web-1", alertCode:"medium", classificationTag:"none", location:"{\"latitude\":45, \"longitude\":23}", picture:this.state.imagePreviewUrl, reportingTime:""}});
-    console.log(this.state.reportData)
+    const imgTemp = this.state.imagePreviewUrl
+    let imagePath = imgTemp.substring(imgTemp.indexOf(',') + 1)
+    const reportData = {name:this.state.name, alertCode:this.state.alertCode, classificationTag:this.state.classificationTag, location:JSON.stringify({latitude:ls.get('location').lat, longitude:ls.get('location').lng}), picture:imagePath, reportingTime:new Date().toISOString()}
+    console.log(reportData)
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.state.reportData)
+      body: JSON.stringify(reportData)
     };
     fetch("/event/saveEvent", requestOptions)
-    .then((res)=>res.json().then((res1)=>
-    {
-      console.log(res1);
-      // this.setState({positionList: res1})
-    }))
-    // .then(data => this.setState({ postId: data.id }));
+    .then(response => {
+    console.log(response)})
   }
   handleName(event) {
     this.setState({name:event.target.value});
@@ -133,14 +133,17 @@ class App extends React.Component {
       this.setState({
         file: file,
         imagePreviewUrl: reader.result
+        
       });
     }
-
+    
     reader.readAsDataURL(file)
+    console.log(this.state.imagePreviewUrl)
   }
 
   render () {
     let {imagePreviewUrl} = this.state;
+    
     return (
       
       <>
@@ -168,7 +171,10 @@ class App extends React.Component {
         <TileLayer attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MapLocation/>
-          {this.state.positionList.map((position,i) =>
+          {this.state.positionList.map((position,i) => {
+          if (position.location !== null)
+          {
+          return(
           <Marker key={i} position={[JSON.parse(position.location).latitude,JSON.parse(position.location).longitude]} icon={defaultIcon}>
             <Popup>
               <div>
@@ -178,7 +184,13 @@ class App extends React.Component {
               </div>
             </Popup>
             <Tooltip permanent direction="top">{position.name}</Tooltip>
-          </Marker>
+          </Marker>);
+          }
+          else
+          {
+            return null;
+          }
+        }
         )}
         <MapLogic/>
         
