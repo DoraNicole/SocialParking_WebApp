@@ -7,22 +7,16 @@ import icon from 'leaflet/dist/images/marker-icon.png'
 import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn } from 'mdbreact';
 import Modal from './components/Modal/Modal'
 let defaultIcon = L.icon({iconUrl: icon});
-let disabledVar = true;
 
 function MapLogic ()
 {
   const [pos,setPos] = React.useState(null);
-  const [,setState] = React.useState();
   
   useMapEvents({
     click(e)
     {
-      disabledVar = false;
-        setPos(e.latlng);
-        document.getElementById("open-btn").style.display = "block";
-        // document.getElementById("main-div").show = true;
-
-        // console.log(disabledVar)
+      setPos(e.latlng);
+      document.getElementById("open-btn").style.display = "block";
         
     },
   })
@@ -64,24 +58,61 @@ class App extends React.Component {
   {
     super(props);
     this.state = {
+      show: false,
       positionList: [],
-      show: true,
       file: '',
-      imagePreviewUrl: ''
+      imagePreviewUrl: '',
+      // reportData: {name:"", alertCode:"", classificationTag:"", location:{}, picture:"", timestamp:""}
+      name: "",
+      alertCode: "",
+      classificationTag:""
     }
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.onDrop = this.onDrop.bind(this);
+    this.collectData = this.collectData.bind(this);
+    this.handleName = this.handleName.bind(this);
+    this.handleCode = this.handleCode.bind(this);
+    this.handleClassification = this.handleClassification.bind(this);
   }
 
   showModal = () => {
-    console.log('here');
+    
     this.setState({ show: true });
+    console.log(this.state.show);
   };
 
   hideModal = () => {
     this.setState({ show: false });
   };
+  collectData = () => {
+    this.setState({reportData:{name:"test-web-1", alertCode:"medium", classificationTag:"none", location:"{\"latitude\":45, \"longitude\":23}", picture:this.state.imagePreviewUrl, reportingTime:""}});
+    console.log(this.state.reportData)
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.state.reportData)
+    };
+    fetch("/event/saveEvent", requestOptions)
+    .then((res)=>res.json().then((res1)=>
+    {
+      console.log(res1);
+      // this.setState({positionList: res1})
+    }))
+    // .then(data => this.setState({ postId: data.id }));
+  }
+  handleName(event) {
+    this.setState({name:event.target.value});
+    // console.log(this.state.reportData)
+  }
+  handleCode(event) {
+    this.setState({alertCode: event.target.value});
+    console.log(this.state.alertCode)
+  }
+  handleClassification(event) {
+    this.setState({classificationTag:event.target.value});
+    console.log(this.state.classificationTag)
+  }
 
   componentDidMount()
   {
@@ -114,23 +145,23 @@ class App extends React.Component {
       
       <>
       
-      <Modal id="main-div" show={this.state.show} handleClose={this.hideModal}>
+      <Modal id="main-div" handleClose={this.hideModal} show={this.state.show} >
           <form className="form">
-            <p className="h4 mb-5">Report an event</p>
-            <div id="details" className="text-left grey-text">
-              <MDBInput id="tag" label="Classify the event"/>
-              <MDBInput id="code" label="Type the alert code"/>
-              <MDBInput id="description" label="Write a description" type="textarea" rows="5" />
+            <h2 className="mb-5" id="form-title">Report an event</h2>
+            <div id="details" className="text-left">
+              <MDBInput id="name" label="Type the event name" onChange={this.handleName}/>
+              <MDBInput id="tag" label="Classify the event" onChange={this.handleClassification}/>
+              <MDBInput id="code" label="Type the alert code" onChange={this.handleCode}/>
             </div>
             <div id="location">
-              <h6 className="text-left dark-grey-text">Location</h6>
+              <h4 className="text-left dark-grey-text">Location</h4>
             </div>
             <div id="eventImage">
-              <h6 className="text-left dark-grey-text">Picture</h6>
+              <h4 className="text-left dark-grey-text">Picture</h4>
               <input type="file" size="sm" onChange={this.onDrop}/>
               <img id="uploaded-image" src={imagePreviewUrl} />   
             </div>
-            <MDBBtn id="add-event">Add event</MDBBtn>
+            <MDBBtn id="add-event" onClick={this.collectData}>Add event</MDBBtn>
           </form>    
         </Modal>       
       <MapContainer id="map-id" center={[0.00, 0.00]} whenCreated={(map) => map.locate()} zoom={12} scrollWheelZoom={true} style={{height: "100vh"}}>

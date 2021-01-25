@@ -12,15 +12,17 @@
     height: 600px;
     overflow-y: auto;
   }
-/* #form-container{
-  min-height: 0;
-} */
+
 .main-div{
     width: 100%;
     height: 100%;
 }
+#tag{
+  width: 500px;
+}
+.form-group, .form-control {width : 300px;}
 #details{
-    width:100%;
+    width:100% !important;
     padding-left: 5px;
     padding-right: 5px;
 }
@@ -46,6 +48,4 @@ input{
 
 #add-event{
   width: fit-content;
-  /* display: flex;
-  justify-content: left; */
 }
