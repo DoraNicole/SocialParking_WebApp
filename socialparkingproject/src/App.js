@@ -1,4 +1,3 @@
-//import axios from 'axios';
 import * as React from 'react';
 import {MapContainer, Marker, Popup, TileLayer, Tooltip, useMapEvents} from 'react-leaflet';
 import './App.css';
@@ -64,28 +63,12 @@ class App extends React.Component {
   constructor(props)
   {
     super(props);
-    //this.state = {positionList: []}
     this.state = {
+      positionList: [],
       show: true,
       file: '',
       imagePreviewUrl: ''
     }
-    this.tempList = [
-      {
-        alertCode: "Vv",
-        classificationTag: "Vvv",
-        location: {latitude: "51.505",longitude: "-0.09"},
-        name: "Event1",
-        reportingTime: "2020-09-01T14:00:00.000Z"
-      },
-      {
-        alertCode: "Bb",
-        classificationTag: "Bbb",
-        location: {latitude: "52.505",longitude: "-1.09"},
-        name: "Event2",
-        reportingTime: "2020-08-01T16:00:00.000Z"
-      }
-    ];
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.onDrop = this.onDrop.bind(this);
@@ -100,10 +83,15 @@ class App extends React.Component {
     this.setState({ show: false });
   };
 
-  /*componentDidMount()
+  componentDidMount()
   {
-    axios.get("localhost:8085/event/getEvents").then((res)=>this.setState({positionList: res.data}));
-  }*/
+    fetch("/event/getEvents")
+     .then((res)=>res.json().then((res1)=>
+     {
+       console.log(res1);
+       this.setState({positionList: res1})
+     }))
+  }
   onDrop(e) {
     e.preventDefault();
 
@@ -149,13 +137,13 @@ class App extends React.Component {
         <TileLayer attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <MapLocation/>
-          {this.tempList.map((position) =>
-          <Marker position={[position.location.latitude,position.location.longitude]} icon={defaultIcon}>
+          {this.state.positionList.map((position,i) =>
+          <Marker key={i} position={[JSON.parse(position.location).latitude,JSON.parse(position.location).longitude]} icon={defaultIcon}>
             <Popup>
               <div>
                   <h4>alertCode: {position.alertCode}</h4>
                   <h4>classificationTag: {position.classificationTag}</h4>
-                  <h4>reportingTime:":{position.reportingTime}</h4>
+                  <h4>reportingTime:{position.reportingTime}</h4>
               </div>
             </Popup>
             <Tooltip permanent direction="top">{position.name}</Tooltip>
